@@ -1,6 +1,6 @@
 # Garage Vehicle Armor
 
-A Cyberpunk 2077 mod that sells armor plating for your vehicles through [Garage](https://www.nexusmods.com/cyberpunk2077/mods/30297) by CyanideX. An "Armor" service appears in the garage hub for vehicles you own.
+A Cyberpunk 2077 mod that sells armor plating for your vehicles through [Garage](https://www.nexusmods.com/cyberpunk2077/mods/30297) by CyanideX. An "Armor" service appears in the garage hub for cars you own.
 
 | Tier | Damage reduction | Acceleration loss | Price | Refit fee |
 |---|---|---|---|---|
@@ -54,7 +54,7 @@ The file starts with instructions: copy the English class, translate the second 
 
 ## Notes
 
-- Armor on a bike protects the bike but not its rider, and bikes take no acceleration loss.
+- Armor is for cars. Motorcycles cannot be armored, and the Armor service does not appear for them.
 - The weight is not written into the vehicle's physics record. Each frame the car gains speed under throttle, part of that gain is pushed back out of it. This leaves the record alone for mods that manage it, such as NCGT, but it only affects forward acceleration: braking, cornering and reversing are unchanged.
 - NCGT's own mechanical wear from crashes is worked out from the impact, not from the damage the armor reduces, so armor does not lessen it.
 - Built and tested on game version 2.3x, alongside NCGT and Vehicle Systems Simulation.

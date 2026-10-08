@@ -36,7 +36,7 @@ public class ArmorSettings {
   @runtimeProperty("ModSettings.mod", "Garage Vehicle Armor")
   @runtimeProperty("ModSettings.category", "Occupants")
   @runtimeProperty("ModSettings.displayName", "Armor protects V")
-  @runtimeProperty("ModSettings.description", "While V is inside an armored car, damage to V is cut by the same amount as damage to the car. Does not apply on bikes.")
+  @runtimeProperty("ModSettings.description", "While V is inside an armored car, damage to V is cut by the same amount as damage to the car.")
   public let protectOccupants: Bool = true;
 
   @runtimeProperty("ModSettings.mod", "Garage Vehicle Armor")
@@ -241,10 +241,15 @@ public class ArmorInstallSystem extends ScriptableSystem {
     return true;
   }
 
-  // The tier fitted to this vehicle, if it is one of the player's own.
+  // Armor is for the player's own cars. A bike has nowhere to carry plating.
+  public static func CanBeArmored(vehicle: wref<VehicleObject>) -> Bool {
+    return IsDefined(vehicle) && vehicle.IsPlayerVehicle() && !IsDefined(vehicle as BikeObject);
+  }
+
+  // The tier fitted to this vehicle, if it is one that can carry armor.
   public static func TierOf(vehicle: wref<VehicleObject>) -> ArmorTier {
     let system: ref<ArmorInstallSystem>;
-    if !IsDefined(vehicle) || !vehicle.IsPlayerVehicle() {
+    if !ArmorInstallSystem.CanBeArmored(vehicle) {
       return ArmorTier.None;
     }
     system = ArmorInstallSystem.Get(vehicle.GetGame());
@@ -299,8 +304,7 @@ public abstract class ArmorWeight {
     if !IsDefined(vehicle) {
       return;
     }
-    // Bikes are left alone: a shove along the frame tips them.
-    penalty = IsDefined(vehicle as BikeObject) ? 0.0 : ArmorInstallSystem.WeightPenaltyFor(vehicle);
+    penalty = ArmorInstallSystem.WeightPenaltyFor(vehicle);
     if penalty <= 0.0 || timeDelta <= 0.0 || timeDelta > 0.25 {
       vehicle.m_gvaWeightTracking = false;
       return;
@@ -368,7 +372,7 @@ private final func ProcessVehicleTarget(hitEvent: ref<gameHitEvent>, cache: ref<
 }
 
 // Hits on V while mounted pass through here. The plating of the car V is sitting
-// in takes its share off them too; a bike leaves its rider in the open.
+// in takes its share off them too.
 @wrapMethod(DamageSystem)
 public final func ProcessOnVehicleMitigation(hitEvent: ref<gameHitEvent>) -> Void {
   let player: ref<PlayerPuppet>;
@@ -380,7 +384,7 @@ public final func ProcessOnVehicleMitigation(hitEvent: ref<gameHitEvent>) -> Voi
     return;
   }
   vehicle = player.GetMountedVehicle();
-  if !IsDefined(vehicle) || IsDefined(vehicle as BikeObject) || !ArmorSettings.Get().protectOccupants {
+  if !IsDefined(vehicle) || !ArmorSettings.Get().protectOccupants {
     return;
   }
   reduction = ArmorInstallSystem.ReductionFor(vehicle);

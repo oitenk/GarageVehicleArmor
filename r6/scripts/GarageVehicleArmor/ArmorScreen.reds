@@ -130,13 +130,10 @@ public class ArmorScreen extends GarageScreen {
     this.m_root.SetVisible(false);
   }
 
-  // The vehicle in the garage, if it is the player's own.
+  // The vehicle in the garage, if it is one that can carry armor.
   private func GetFittableVehicle() -> wref<VehicleObject> {
     let settings = GarageSettings.GetInstance(this.GetGameInstance());
-    if !IsDefined(settings) || !IsDefined(settings.garageVehicle) {
-      return null;
-    }
-    if !settings.garageVehicle.IsPlayerVehicle() {
+    if !IsDefined(settings) || !ArmorInstallSystem.CanBeArmored(settings.garageVehicle) {
       return null;
     }
     return settings.garageVehicle;

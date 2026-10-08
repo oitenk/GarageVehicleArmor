@@ -18,7 +18,7 @@ public class ArmorRegistrar extends ServiceModuleRegistrar {
   public func GetDescriptors() -> array<ref<ServiceDescriptor>> {
     let descriptors: array<ref<ServiceDescriptor>>;
     let desc = new ServiceDescriptor();
-    let cond = new VisibilityConditions();
+    let cond = new ArmorVisibility();
     cond.requireOwned = true;
     desc.id = n"gva_armor";
     desc.label = UTF8StrUpper(ArmorText("GarageVehicleArmor-Title"));
@@ -28,6 +28,16 @@ public class ArmorRegistrar extends ServiceModuleRegistrar {
     desc.clickHandler = new ArmorClickHandler();
     ArrayPush(descriptors, desc);
     return descriptors;
+  }
+}
+
+// Only owned cars can be armored, so the button is hidden for bikes.
+public class ArmorVisibility extends VisibilityConditions {
+  public func IsMet(context: ref<GarageContext>) -> Bool {
+    if !super.IsMet(context) {
+      return false;
+    }
+    return ArmorInstallSystem.CanBeArmored(context.vehicle);
   }
 }
 
