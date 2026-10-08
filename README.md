@@ -46,6 +46,12 @@ With Mod Settings installed, under **Garage Vehicle Armor**:
 
 Setting an acceleration loss to 0 turns the weight penalty off for that tier. Prices are fixed.
 
+## Translating
+
+The text the mod shows in game goes through Codeware's localization system, so it can be translated without touching the rest of the code. It is all in `r6/scripts/GarageVehicleArmor/ArmorLocalization.reds`.
+
+The file starts with instructions: copy the English class, translate the second string on each line, and return the new class for your language. English is used for any language without a translation. The Mod Settings page is in English only. Translations are welcome as pull requests.
+
 ## Notes
 
 - Armor on a bike protects the bike but not its rider, and bikes take no acceleration loss.

@@ -13,11 +13,11 @@ public abstract class ArmorCatalog {
   public static func Label(tier: ArmorTier) -> String {
     switch tier {
       case ArmorTier.Light:
-        return "LIGHT ARMOR";
+        return UTF8StrUpper(ArmorText("GarageVehicleArmor-Light"));
       case ArmorTier.Medium:
-        return "MEDIUM ARMOR";
+        return UTF8StrUpper(ArmorText("GarageVehicleArmor-Medium"));
       case ArmorTier.Heavy:
-        return "HEAVY ARMOR";
+        return UTF8StrUpper(ArmorText("GarageVehicleArmor-Heavy"));
     }
     return "";
   }
@@ -63,7 +63,7 @@ public class ArmorScreen extends GarageScreen {
     root.SetVisible(false);
 
     this.CreateBackButton(root);
-    this.CreateTitle(root, "ARMOR", 60.0);
+    this.CreateTitle(root, UTF8StrUpper(ArmorText("GarageVehicleArmor-Title")), 60.0);
 
     let column = new inkVerticalPanel();
     column.SetName(n"gvaColumn");
@@ -75,11 +75,11 @@ public class ArmorScreen extends GarageScreen {
     this.m_vehicleText = this.AddText(column, n"gvaVehicle", 48, n"Bold", GarageColors.AccentBlue());
     this.m_balanceText = this.AddText(column, n"gvaBalance", 30, n"Regular", GarageColors.AccentBlue());
     this.m_lightText = this.AddText(column, n"gvaLightText", 36, n"Regular", new HDRColor(1.0, 0.81, 0.06, 1.0));
-    this.m_lightBtn = this.CreateStandardButton(n"gvaLightBtn", "INSTALL", 300.0, this.AddButtonHolder(column, n"gvaLightHolder"), n"OnLightClick");
+    this.m_lightBtn = this.CreateStandardButton(n"gvaLightBtn", this.ButtonText("Install"), 300.0, this.AddButtonHolder(column, n"gvaLightHolder"), n"OnLightClick");
     this.m_mediumText = this.AddText(column, n"gvaMediumText", 36, n"Regular", new HDRColor(1.0, 0.81, 0.06, 1.0));
-    this.m_mediumBtn = this.CreateStandardButton(n"gvaMediumBtn", "INSTALL", 300.0, this.AddButtonHolder(column, n"gvaMediumHolder"), n"OnMediumClick");
+    this.m_mediumBtn = this.CreateStandardButton(n"gvaMediumBtn", this.ButtonText("Install"), 300.0, this.AddButtonHolder(column, n"gvaMediumHolder"), n"OnMediumClick");
     this.m_heavyText = this.AddText(column, n"gvaHeavyText", 36, n"Regular", new HDRColor(1.0, 0.81, 0.06, 1.0));
-    this.m_heavyBtn = this.CreateStandardButton(n"gvaHeavyBtn", "INSTALL", 300.0, this.AddButtonHolder(column, n"gvaHeavyHolder"), n"OnHeavyClick");
+    this.m_heavyBtn = this.CreateStandardButton(n"gvaHeavyBtn", this.ButtonText("Install"), 300.0, this.AddButtonHolder(column, n"gvaHeavyHolder"), n"OnHeavyClick");
 
     this.m_root = root;
     this.SetRootWidget(root);
@@ -105,6 +105,18 @@ public class ArmorScreen extends GarageScreen {
     holder.SetHAlign(inkEHorizontalAlign.Center);
     holder.Reparent(parent);
     return holder;
+  }
+
+  private func ButtonText(name: String) -> String {
+    return UTF8StrUpper(ArmorText("GarageVehicleArmor-" + name));
+  }
+
+  // One of the tier lines, with the tier's name, its damage reduction and a price filled in.
+  private func LineText(name: String, tier: ArmorTier, price: Int32) -> String {
+    let text = ArmorText("GarageVehicleArmor-" + name);
+    text = StrReplace(text, "{NAME}", ArmorCatalog.Label(tier));
+    text = StrReplace(text, "{PERCENT}", IntToString(ArmorSettings.Get().ReductionPercent(tier)));
+    return StrReplace(text, "{PRICE}", FormatPrice(price));
   }
 
   public func Show() -> Void {
@@ -149,37 +161,36 @@ public class ArmorScreen extends GarageScreen {
     if IsDefined(vehicle) && IsDefined(settings) {
       this.m_vehicleText.SetText(settings.sellVehicleDisplayName);
     } else {
-      this.m_vehicleText.SetText("No vehicle to armor");
+      this.m_vehicleText.SetText(ArmorText("GarageVehicleArmor-NoVehicle"));
     }
-    this.m_balanceText.SetText("Balance: " + FormatPrice(balance));
+    this.m_balanceText.SetText(StrReplace(ArmorText("GarageVehicleArmor-Balance"), "{AMOUNT}", FormatPrice(balance)));
     this.PopulateRow(vehicle, ArmorTier.Light, balance, this.m_lightText, this.m_lightBtn);
     this.PopulateRow(vehicle, ArmorTier.Medium, balance, this.m_mediumText, this.m_mediumBtn);
     this.PopulateRow(vehicle, ArmorTier.Heavy, balance, this.m_heavyText, this.m_heavyBtn);
   }
 
   private func PopulateRow(vehicle: wref<VehicleObject>, tier: ArmorTier, balance: Int32, line: wref<inkText>, btn: ref<SimpleButton>) -> Void {
-    let label = ArmorCatalog.Label(tier) + " (-" + IntToString(ArmorSettings.Get().ReductionPercent(tier)) + "% damage)";
     let usable = false;
     let installs: ref<ArmorInstallSystem>;
     let cost: Int32;
     let btnRoot: wref<inkWidget>;
     if !IsDefined(vehicle) {
-      line.SetText(label + " - " + FormatPrice(ArmorCatalog.Price(tier)) + " eddies");
-      btn.SetText("INSTALL");
+      line.SetText(this.LineText("ForSale", tier, ArmorCatalog.Price(tier)));
+      btn.SetText(this.ButtonText("Install"));
     } else {
       installs = ArmorInstallSystem.Get(vehicle.GetGame());
       cost = this.CostOf(vehicle, tier);
       if Equals(installs.GetInstalled(vehicle.GetRecordID()), tier) {
-        line.SetText(label + " - installed");
-        btn.SetText("REMOVE");
+        line.SetText(this.LineText("Installed", tier, 0));
+        btn.SetText(this.ButtonText("Remove"));
         usable = true;
       } else {
         if installs.IsOwned(vehicle.GetRecordID(), tier) {
-          line.SetText(label + " - refit for " + FormatPrice(cost) + " eddies");
-          btn.SetText("REFIT");
+          line.SetText(this.LineText("RefitFor", tier, cost));
+          btn.SetText(this.ButtonText("Refit"));
         } else {
-          line.SetText(label + " - " + FormatPrice(cost) + " eddies");
-          btn.SetText("INSTALL");
+          line.SetText(this.LineText("ForSale", tier, cost));
+          btn.SetText(this.ButtonText("Install"));
         }
         usable = balance >= cost;
       }
@@ -207,7 +218,7 @@ public class ArmorScreen extends GarageScreen {
       cost = this.CostOf(vehicle, tier);
       if LuaBridge.GetPlayerMoney() >= cost && ArmorBridge.Charge(cost) {
         installs.Install(vehicle.GetRecordID(), tier);
-        ArmorBridge.Complete(ArmorCatalog.Label(tier) + " fitted");
+        ArmorBridge.Complete(StrReplace(ArmorText("GarageVehicleArmor-Fitted"), "{NAME}", ArmorCatalog.Label(tier)));
       }
     }
     // Stay on the screen so the result shows against the other tiers.

@@ -21,7 +21,7 @@ public class ArmorRegistrar extends ServiceModuleRegistrar {
     let cond = new VisibilityConditions();
     cond.requireOwned = true;
     desc.id = n"gva_armor";
-    desc.label = "ARMOR";
+    desc.label = UTF8StrUpper(ArmorText("GarageVehicleArmor-Title"));
     // Between Nitro (35) / Targeting (36) and Repair (40).
     desc.priority = 38;
     desc.visibilityConditions = cond;
