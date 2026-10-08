@@ -1,0 +1,3 @@
+# Release zips are built from the source folders and attached to releases instead.
+dist/
+*.zip
