@@ -31,7 +31,8 @@ public class ArmorRegistrar extends ServiceModuleRegistrar {
   }
 }
 
-// Only owned cars can be armored, so the button is hidden for bikes.
+// Only owned cars can be armored, so the button is hidden for bikes and for
+// vehicles that are built as armor already.
 public class ArmorVisibility extends VisibilityConditions {
   public func IsMet(context: ref<GarageContext>) -> Bool {
     if !super.IsMet(context) {

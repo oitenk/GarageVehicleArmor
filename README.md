@@ -55,6 +55,7 @@ The file starts with instructions: copy the English class, translate the second 
 ## Notes
 
 - Armor is for cars. Motorcycles cannot be armored, and the Armor service does not appear for them.
+- Three purpose-built military vehicles from other mods are heavily protected as they come, so the Armor service does not appear for them either: the Solvind TOR, the CINO RAM and the BA-06X Avalanche. None of them needs to be installed.
 - The weight is not written into the vehicle's physics record. Each frame the car gains speed under throttle, part of that gain is pushed back out of it. This leaves the record alone for mods that manage it, such as NCGT, but it only affects forward acceleration: braking, cornering and reversing are unchanged.
 - NCGT's own mechanical wear from crashes is worked out from the impact, not from the damage the armor reduces, so armor does not lessen it.
 - Built and tested on game version 2.3x, alongside NCGT and Vehicle Systems Simulation.

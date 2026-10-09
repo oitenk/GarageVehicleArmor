@@ -241,9 +241,20 @@ public class ArmorInstallSystem extends ScriptableSystem {
     return true;
   }
 
+  // Military vehicles added by other mods that are built as armor already: a
+  // tank, an APC and an armored truck with several times a car's health. Garage
+  // armor is not offered for them. The IDs are plain names, so none of those
+  // mods needs to be installed.
+  public static func IsBuiltAsArmor(record: TweakDBID) -> Bool {
+    return record == t"Vehicle.tor_standalone_00"
+      || record == t"Vehicle.EBLC_CRAB_standalone_00"
+      || record == t"Vehicle.ba_06x_base";
+  }
+
   // Armor is for the player's own cars. A bike has nowhere to carry plating.
   public static func CanBeArmored(vehicle: wref<VehicleObject>) -> Bool {
-    return IsDefined(vehicle) && vehicle.IsPlayerVehicle() && !IsDefined(vehicle as BikeObject);
+    return IsDefined(vehicle) && vehicle.IsPlayerVehicle() && !IsDefined(vehicle as BikeObject)
+      && !ArmorInstallSystem.IsBuiltAsArmor(vehicle.GetRecordID());
   }
 
   // The tier fitted to this vehicle, if it is one that can carry armor.
